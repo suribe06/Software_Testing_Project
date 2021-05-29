@@ -1,0 +1,41 @@
+{% extends 'main_admin.html' %}
+
+<head>
+  <link rel="stylesheet" href="/static/css/main_admin.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+
+{% block content %}
+<table style="width:100% align:center;">
+  <tr>
+    <td style="text-align:center; height:180px">
+      <p style="font-size:50px;">Llene el formulario para agregar a un admin</p>
+    </td>
+  </tr>
+  <form class="" action="/agregar_admin" method="post">
+  <tr>
+    <td style="text-align:center; height:80px">
+      <input type="text" name="nombres" placeholder="Nombres" required>
+    </td>
+  </tr>
+  <tr>
+    <td style="text-align:center; height:80px">
+      <input type="text" name="apellidos" placeholder="Apellidos" required>
+    </td>
+  </tr>
+  <tr>
+    <td style="text-align:center; height:80px">
+      <input type="text" name="usuario" placeholder="Nombre de usuario" required>
+    </td>
+  </tr>
+  <tr>
+    <td style="text-align:center; height:80px">
+      <input type="submit" id="borrar" name="btn" value="Agregar">
+    </td>
+  </tr>
+  </form>
+</table>
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}
