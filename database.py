@@ -41,7 +41,6 @@ def registroP(usr,n,bar,cat,cor,dep,dir,mun,pasw,rsol,tel):
 			sessionDB.execute("INSERT INTO publica (username,Nit,barrio,categoria,correo,departamento,direccion,municipio,password,rsocial,telefono1,telefono2,telefono3) VALUES ('{0}',{1},'{2}','{11}','{3}','{4}','{5}','{6}','{7}','{8}',{9},{10},NULL)".format(usr,n,bar,cor,dep,dir,mun,pasw,rsol,tel[0],tel[1],cat))
 		else:
 			sessionDB.execute("INSERT INTO publica (username,Nit,barrio,categoria,correo,departamento,direccion,municipio,password,rsocial,telefono1,telefono2,telefono3) VALUES ('{0}',{1},'{2}','{10}','{3}','{4}','{5}','{6}','{7}','{8}',{9},NULL,NULL)".format(usr,n,bar,cor,dep,dir,mun,pasw,rsol,tel[0],cat))
-	return
 
 def getNd(usr):
 	"""
@@ -88,7 +87,6 @@ def editC(usr,pasw,ndoc,ape,bar,cor,dep,dire,mun,nac,nom,sex,tdoc,tel):
 		exe+= exe1
 		print(exe)
 		sessionDB.execute(exe)
-	return
 
 def regVisita(ni,nd,td,nom,ape,tem,tap,rsol,cat):
 	"""
@@ -110,7 +108,6 @@ def regVisita(ni,nd,td,nom,ape,tem,tap,rsol,cat):
 	        if not(temperatura):
 	            razon = razon + '- Temperatura elevada '
 	        sessionDB.execute("INSERT INTO visitas (id,nit,ndocumento,apellidos,categoria,fent,hent,nombres,reason,rsocial,tapa,tdocumento,temp,veredict) VALUES({0},{1},{2},'{3}','{16}','{4}-{5}-{6}','{13}:{14}:{15}','{7}','{8}','{12}',{9},'{10}',{11},False)".format(i,ni,nd,ape,dia.year,dia.strftime("%m"),dia.strftime("%d"),nom,razon,tap,td,tem,rsol,dia.hour,dia.minute,dia.second,cat))
-	return
 
 def hVisitas(nd,td):
 	"""
@@ -179,7 +176,6 @@ def editP(usr,n,bar,cor,dep,dire,mun,pasw,rsol,tel1,tel2,tel3):
 		exe = exe[:len(exe)-1]
 		exe+= exe1
 		sessionDB.execute(exe)
-	return
 
 def getCorC(usr):
 	"""
@@ -242,7 +238,6 @@ def regVDestiempo(ni,nd,td,nom,ape,tem,tap,rsol,cat,fecha,hora):
 	        if not(temperatura):
 	            razon = razon + '- Temperatura elevada '
 	        sessionDB.execute("INSERT INTO visitas (id,nit,ndocumento,apellidos,categoria,fent,hent,nombres,reason,rsocial,tapa,tdocumento,temp,veredict) VALUES({0},{1},{2},'{3}','{11}','{4}','{10}:00','{5}','{12}','{9}',{6},'{7}',{8},False)".format(i,ni,nd,ape,fecha,nom,tap,td,tem,rsol,hora,cat,razon))
-	return
 
 def fVisitasP(ni,ver,fi,ff):
 	"""
