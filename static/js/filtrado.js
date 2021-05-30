@@ -14,8 +14,8 @@ $('#myModal').on('shown.bs.modal', function () {
 })
 
 function cambiarEstado(){
-    new_dep = document.getElementById("tipoFiltrado").value;
-    new_type = document.getElementById("texto");
+    var new_dep = document.getElementById("tipoFiltrado").value;
+    var new_type = document.getElementById("texto");
 
     if(new_dep == "FI" ){
       new_type.type = 'date';

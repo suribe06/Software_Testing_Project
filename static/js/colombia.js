@@ -33,7 +33,7 @@ cargarDepartamento();
 
 function cargarMunicipio(){
 		let auxHTML = '';
-    new_dep = document.getElementById("departamento").value
+    var new_dep = document.getElementById("departamento").value
     auxHTML+= '<option  disabled selected>Municipio</option>'
     for (var index in jsonDatos){
       if(jsonDatos[index].departamento == new_dep){
@@ -49,7 +49,7 @@ function cargarMunicipio(){
 
 function cargarBarrios(){
 		let auxHTML = '';
-    new_mun = document.getElementById("municipio").value
+    var new_mun = document.getElementById("municipio").value
     auxHTML+= '<option  disabled selected>Barrio</option>'
     for (var index in jsonDatos_2){
       if(jsonDatos_2[index].ciudad == new_mun){

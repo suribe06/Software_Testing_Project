@@ -14,14 +14,11 @@ body, html {
   height: 100%;
   font-size: 30px;
   text-align: center;
+  top: auto;
 }
 
 #cont{
   padding: 0px !important;
-}
-
-.selection{
-
 }
 
 #cols1{
@@ -52,10 +49,6 @@ body, html {
 
 #logo{
   height: 100%;
-}
-
-#header{
-  top: auto;
 }
 
 #Imglog{
