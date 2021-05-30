@@ -175,7 +175,7 @@ def vista_riesgo():
     return render_template('vista_riesgo.html', usuario=usuario, mensaje_riesgo=mensaje_riesgo)
 
 #VISTA DEL CODIGO QR PARA EL CIVIL
-@app.route('/qr', methods=['GET','POST'])
+@app.route('/qr', methods=['GET'])
 def vista_qr():
     usuario = session['user']
     ndu = getNd(usuario)
