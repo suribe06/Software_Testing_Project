@@ -208,47 +208,6 @@ def vista_historiales():
                 download_pdf(fields, hist_completo, 1)
     return render_template('vista_historiales.html', usuario=usuario, hist_completo=hist_completo)
 
-#VISTA CONTACTO PARA EL CIVIL
-@app.route('/contacto_civil', methods=['GET','POST'])
-def contacto():
-    usuario = session['user']
-    if 'user' in session:
-        if request.method == 'POST':
-            if request.form["btn"] == "Enviar":
-                td_ = str(request.form.get('TD'))
-                nd_ = request.form['ND']
-                nombres_ = request.form['nombres']
-                apellidos_ = request.form['apellidos']
-                email = request.form['correo']
-                comentarios_ = request.form['comentarios']
-                m1 = ""
-                m1 += nombres_ + " " + apellidos_ + " identificado con " + td_ + " " + nd_ + " te envio los siguientes comentarios " + comentarios_ + ". Responder al correo " + email
-                enviar_correo("gerentebbgm@gmail.com", "Solicitud de contacto", m1)
-                m2 = "Tus comentarios fueron enviados con exito. Pronto te responderemos."
-                enviar_correo(email, "Envio Solicitud de Contacto", m2)
-            elif request.form["btn"] == "Volver":
-                return redirect(url_for('main_civil'))
-    return render_template('contacto_civil.html', usuario=usuario)
-
-#VISTA CONTACTO PARA ENTIDAD PUBLICA
-@app.route('/contacto_publico', methods=['GET','POST'])
-def contacto_publico():
-    usuario = session['user']
-    if 'user' in session:
-        if request.method == 'POST':
-            if request.form["btn"] == "Enviar":
-                nit_ = request.form['NIT']
-                email = request.form['correo']
-                comentarios_ = request.form['comentarios']
-                m1 = ""
-                m1 += "La entidad publica identificada con el NIT " + nit_ + " te envio los siguientes comentarios " + comentarios_ + ". Responder al correo " + email
-                enviar_correo("gerentebbgm@gmail.com", "Solicitud de contacto", m1)
-                m2 = "Tus comentarios fueron enviados con exito. Pronto te responderemos."
-                enviar_correo(email, "Envio Solicitud de Contacto", m2)
-            elif request.form["btn"] == "Volver":
-                return redirect(url_for('main_publico'))
-    return render_template('contacto_publica.html', usuario=usuario)
-
 #VISTA EDITAR PERFIL PARA EL CIVIL
 @app.route('/edit_perfil', methods=['GET','POST'])
 def editar_perfil_civil():
