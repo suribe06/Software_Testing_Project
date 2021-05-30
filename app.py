@@ -30,12 +30,8 @@ def login():
             ans, tp = inicio(u, p)
             if ans:
                 session['user'] = request.form['user']
-                if tp == 0:
-                    return redirect(url_for('main_admin'))
                 if tp == 1:
                     return redirect(url_for('main_civil'))
-                if tp == 2:
-                    return redirect(url_for('main_salud'))
                 if tp == 3:
                     return redirect(url_for('main_publico'))
             else:
@@ -55,8 +51,6 @@ def register_select():
             return redirect(url_for('register_civil'))
         elif select_tipo == "EP":
             return redirect(url_for('register_publico'))
-        elif select_tipo == "ES":
-            return redirect(url_for('register_salud'))
     return render_template('register_select.html')
 
 #VISTA REGISTRO DEL CIVIL
@@ -119,129 +113,6 @@ def register_publico():
         return redirect(url_for('login'))
     return render_template('register_publico.html')
 
-#VISTA REGISTRO ENTIDAD DE SALUD
-@app.route('/register_salud', methods=['GET','POST'])
-def register_salud():
-    if request.method == 'POST':
-        nit_ = request.form['NIT']
-        razon_ = request.form['razon']
-        dept_ = str(request.form.get('departamento'))
-        mun_ = str(request.form.get('municipio'))
-        barrio_ = str(request.form.get('barrio'))
-        dir_ = request.form['direccion']
-        tels = []
-        t1 = request.form['T1']
-        tels.append(int(t1))
-        t2 = request.form['T2']
-        if len(t2) != 0: tels.append(int(t2))
-        t3 = request.form['T3']
-        if len(t3) != 0: tels.append(int(t3))
-        email = request.form['correo']
-        u = request.form['username']
-        p = encriptar(request.form['password'])
-        #Registro de la entidad salud en la base de datos
-        registroS(u, int(nit_), barrio_, email, dept_, dir_, mun_, p, razon_, tels)
-        m = ""
-        m += "La entidad de salud identificada con el NIT " + nit_ + " se acaba de registrar en el sistema"
-        enviar_correo("gerentebbgm@gmail.com", "Registro entidad de salud", m)
-        return redirect(url_for('login'))
-    return render_template('register_salud.html')
-
-#VISTA MAIN ADMIN
-@app.route('/main_admin', methods=['GET','POST'])
-def main_admin():
-    if 'user' in session:
-        usuario = session['user']
-        if request.method == 'POST':
-            if request.form["btn"] == "Cerrar Sesión":
-                session.pop('user', None)
-                return redirect(url_for('login'))
-            elif request.form["btn"] == "Editar Perfil":
-                return redirect(url_for('editar_perfil_admin'))
-            elif request.form["btn"] == "Borrar Perfil":
-                return redirect(url_for('borrar_perfil'))
-            elif request.form["btn"] == "Historial Visitas":
-                return redirect(url_for('hv_admin'))
-            elif request.form["btn"] == "Historial Pruebas":
-                return redirect(url_for('hc_admin'))
-            elif request.form["btn"] == "Registrar Admin":
-                return redirect(url_for('agregar_admin'))
-    return render_template('main_admin.html', usuario=usuario)
-
-#VISTA HISTORIALES VISITAS DE CIVILES (ADMIN)
-@app.route('/hv_admin', methods=['GET','POST'])
-def hv_admin():
-    fields = ['Establecimiento Publico', 'Tipo Documento', 'Numero Documento', 'Fecha Entrada', 'Hora Entrada', 'Veredicto', 'Razón']
-    usuario = session['user']
-    hist_completo = allVisitas()
-    if request.method == 'POST':
-        if request.form["btn"] == "Descargar":
-            if str(request.form.get('formato')) == "CSV":
-                download_csv(fields, hist_completo, 1)
-            elif str(request.form.get('formato')) == "PDF":
-                download_pdf(fields, hist_completo, 1)
-    return render_template('vista_adminHV.html', usuario=usuario, hist_completo=hist_completo)
-
-#VISTA HISTORIALES PRUEBAS COVID-19 CIVILES (ADMIN)
-@app.route('/hc_admin', methods=['GET','POST'])
-def hc_admin():
-    fields = fields = ['Establecimiento de Salud', 'Tipo Documento', 'Numero Documento', 'Fecha de Realización', 'Fecha Obtención Resultado', 'Resultado']
-    usuario = session['user']
-    hist_completo = allExamenes()
-    if request.method == 'POST':
-        if request.form["btn"] == "Descargar":
-            if str(request.form.get('formato')) == "CSV":
-                download_csv(fields, hist_completo, 2)
-            elif str(request.form.get('formato')) == "PDF":
-                download_pdf(fields, hist_completo, 2)
-    return render_template('vista_adminHC.html', usuario=usuario, hist_completo=hist_completo)
-
-#VISTA BORRAR PERFIL (ADMIN)
-@app.route('/borrar_perfil', methods=['GET','POST'])
-def borrar_perfil():
-    usuario = session['user']
-    if request.method == 'POST':
-        if request.form["btn"] == "Eliminar":
-            u = request.form['usuario']
-            t = getTipo(u)
-            if t == 1:
-                ndu = getNd(u)
-                scriptPath = sys.path[0]
-                UPLOAD_PATH = os.path.join(scriptPath, 'static/images/')
-                filename = "QR_{0}.png".format(ndu)
-                os.remove('{0}{1}'.format(UPLOAD_PATH, filename))
-            deleteU(u)
-    return render_template('vista_borrarPerfil.html', usuario=usuario)
-
-#VISTA AGREGAR ADMIN (ADMIN)
-@app.route('/agregar_admin', methods=['GET','POST'])
-def agregar_admin():
-    usuario = session['user']
-    if request.method == 'POST':
-        if request.form["btn"] == "Agregar":
-            nombres_ = request.form['nombres']
-            apellidos_ = request.form['apellidos']
-            u = request.form['usuario']
-            registroA(u, encriptar("admin"), nombres_, apellidos_)
-    return render_template('vista_agregar_admin.html', usuario=usuario)
-
-#VISTA EDITAR PERFIL ADMIN
-@app.route('/editar_perfil_admin', methods=['GET','POST'])
-def editar_perfil_admin():
-    usuario = session['user']
-    if request.method == 'POST':
-        if request.form["btn"] == "Guardar":
-            if len(request.form['nombres']) != 0: nombres_ = request.form['nombres']
-            else: nombres_ = None
-            if len(request.form['apellidos']) != 0: apellidos_ = request.form['apellidos']
-            else: apellidos_ = None
-            if len(request.form['contraseña']) != 0: p = encriptar(request.form['contraseña'])
-            else: p = None
-            editA(usuario,p,nombres_,apellidos_)
-        elif request.form["btn"] == "Volver":
-            return redirect(url_for('main_admin'))
-    return render_template('editar_perfil_admin.html', usuario=usuario)
-
 #VISTA MAIN CIVIL
 @app.route('/main_civil', methods=['GET','POST'])
 def main_civil():
@@ -256,8 +127,6 @@ def main_civil():
                 return redirect(url_for('vista_qr'))
             elif request.form["btn"] == "Historial de visitas":
                 return redirect(url_for('vista_historiales'))
-            elif request.form["btn"] == "Resultados COVID-19":
-                return redirect(url_for('vista_covid'))
             elif request.form["btn"] == "Contáctanos":
                 return redirect(url_for('contacto'))
             elif request.form["btn"] == "Editar Perfil":
@@ -265,28 +134,6 @@ def main_civil():
             elif request.form["btn"] == "Calcular Riesgo":
                 return redirect(url_for('vista_riesgo'))
     return render_template('main_civil2.html', usuario=usuario)
-
-#VISTA MAIN ENTIDAD DE SALUD
-@app.route('/main_salud', methods=['GET','POST'])
-def main_salud():
-    usuario = None
-    if 'user' in session:
-        usuario = session['user']
-        if request.method == 'POST':
-            if request.form["btn"] == "Cerrar Sesión":
-                session.pop('user', None)
-                return redirect(url_for('login'))
-            elif request.form["btn"] == "Contáctanos":
-                return redirect(url_for('contacto_salud'))
-            elif request.form["btn"] == "Editar Perfil":
-                return redirect(url_for('editar_perfil_salud'))
-            elif request.form["btn"] == "Historial pruebas COVID-19":
-                return redirect(url_for('vista_pruebas_covid'))
-            elif request.form["btn"] == "Registro prueba COVID-19":
-                return redirect(url_for('vista_registro_prueba_covid'))
-            elif request.form["btn"] == "Registro resultado prueba COVID-19":
-                return redirect(url_for('reg_res_exam'))
-    return render_template('main_salud.html', usuario=usuario)
 
 #VISTA MAIN ENTIDAD PUBLICA
 @app.route('/main_publico', methods=['GET','POST'])
@@ -363,32 +210,6 @@ def vista_historiales():
                 download_pdf(fields, hist_completo, 1)
     return render_template('vista_historiales.html', usuario=usuario, hist_completo=hist_completo)
 
-#VISTA HISTORIALES DE PRUEBAS COVID PARA CIVIL
-@app.route('/pruebas_covid', methods=['GET','POST'])
-def vista_covid():
-    fields = ['Establecimiento de Salud', 'Fecha de Realización', 'Fecha Obtención Resultado', 'Resultado']
-    usuario = session['user']
-    ndu = getNd(usuario)
-    tdu = getTd(usuario)
-    hist_completo = hExamenes(ndu, tdu)
-    if request.method == 'POST':
-        if request.form["btn"] == "Descargar":
-            if str(request.form.get('formato')) == "CSV":
-                download_csv(fields, hist_completo, 2)
-            elif str(request.form.get('formato')) == "PDF":
-                download_pdf(fields, hist_completo, 2)
-        elif request.form["btn"] == "Filtrar":
-            if len(request.form['fi']) != 0: fi_ = request.form['fi']
-            else: fi_ = None
-            if len(request.form['ff']) != 0: ff_ = request.form['ff']
-            else: ff_ = None
-            if request.form.get('categoria') != None: cat_ = str(request.form.get('categoria'))
-            else: cat_ = None
-            nd_ = getNd(usuario)
-            td_ = getTd(usuario)
-            hist_completo = fExamenesC(nd_,td_,cat_,fi_,ff_)
-    return render_template('vista_covid.html', usuario=usuario, hist_completo=hist_completo)
-
 #VISTA CONTACTO PARA EL CIVIL
 @app.route('/contacto_civil', methods=['GET','POST'])
 def contacto():
@@ -429,25 +250,6 @@ def contacto_publico():
             elif request.form["btn"] == "Volver":
                 return redirect(url_for('main_publico'))
     return render_template('contacto_publica.html', usuario=usuario)
-
-#VISTA CONTACTO PARA ENTIDAD DE SALUD
-@app.route('/contacto_salud', methods=['GET','POST'])
-def contacto_salud():
-    usuario = session['user']
-    if 'user' in session:
-        if request.method == 'POST':
-            if request.form["btn"] == "Enviar":
-                nit_ = request.form['NIT']
-                email = request.form['correo']
-                comentarios_ = request.form['comentarios']
-                m1 = ""
-                m1 += "La entidad de salud identificada con el NIT " + nit_ + " te envio los siguientes comentarios " + comentarios_ + ". Responder al correo " + email
-                enviar_correo("gerentebbgm@gmail.com", "Solicitud de contacto", m1)
-                m2 = "Tus comentarios fueron enviados con exito. Pronto te responderemos."
-                enviar_correo(email, "Envio Solicitud de Contacto", m2)
-            elif request.form["btn"] == "Volver":
-                return redirect(url_for('main_salud'))
-    return render_template('contacto_salud.html', usuario=usuario)
 
 #VISTA EDITAR PERFIL PARA EL CIVIL
 @app.route('/edit_perfil', methods=['GET','POST'])
@@ -511,75 +313,6 @@ def editar_perfil_publico():
             elif request.form["btn"] == "Volver":
                 return redirect(url_for('main_publico'))
     return render_template('editar_perfil_publico.html', usuario=usuario)
-
-#VISTA EDITAR PERFIL PARA ENTIDAD DE SALUD
-@app.route('/edit_perfil_salud', methods=['GET','POST'])
-def editar_perfil_salud():
-    usuario = session['user']
-    if 'user' in session:
-        if request.method == 'POST':
-            if request.form["btn"] == "Guardar":
-                if len(request.form['razon']) != 0: razon_ = request.form['razon']
-                else: razon_ = None
-                if len(request.form['T1']) != 0: tel1_ = int(request.form['T1'])
-                else: tel1_ = None
-                if len(request.form['T2']) != 0: tel2_ = int(request.form['T2'])
-                else: tel2_ = None
-                if len(request.form['T3']) != 0: tel3_ = int(request.form['T3'])
-                else: tel3_ = None
-                if request.form.get('departamento') != None: dept_ = str(request.form.get('departamento'))
-                else: dept_ = None
-                if request.form.get('municipio') != None: mun_ = str(request.form.get('municipio'))
-                else: mun_ = None
-                if request.form.get('barrio') != None: barrio_ = str(request.form.get('barrio'))
-                else: barrio_ = None
-                nit_ = getNitS(usuario)
-                editS(usuario, nit_, barrio_, None, dept_, None, mun_, None, razon_, tel1_, tel2_, tel3_)
-            elif request.form["btn"] == "Volver":
-                return redirect(url_for('main_salud'))
-    return render_template('editar_perfil_salud.html', usuario=usuario)
-
-#VISTA HISTORIALES PRUEBAS COVID ENTIDAD DE SALUD
-@app.route('/histo_covid', methods=['GET','POST'])
-def vista_pruebas_covid():
-    fields = ["Persona", "Fecha de Realización", "Fecha Resultado", "Resultado"]
-    usuario = session['user']
-    nitus = getNitS(usuario)
-    hist_completo = hExamenesS(nitus)
-    if request.method == 'POST':
-        if request.form["btn"] == "Descargar":
-            if str(request.form.get('formato')) == "CSV":
-                download_csv(fields, hist_completo, 2)
-            elif str(request.form.get('formato')) == "PDF":
-                download_pdf(fields, hist_completo, 2)
-        elif request.form["btn"] == "Filtrar":
-            if len(request.form['fi']) != 0: fi_ = request.form['fi']
-            else: fi_ = None
-            if len(request.form['ff']) != 0: ff_ = request.form['ff']
-            else: ff_ = None
-            if request.form.get('categoria') != None: cat_ = str(request.form.get('categoria'))
-            else: cat_ = None
-            nit_ = getNitS(usuario)
-            hist_completo = fExamenesS(nit_, cat_, fi_, ff_)
-    return render_template('vista_historial_p_covid.html', usuario=usuario, hist_completo=hist_completo)
-
-#VISTA REGISTRO PRUEBA COVID ENTIDAD DE SALUD
-@app.route('/registro_p_covid', methods=['GET','POST'])
-def vista_registro_prueba_covid():
-    usuario = session['user']
-    if request.method == 'POST':
-        if request.form["btn"] == "Registrar Examen":
-            td_ = str(request.form.get('TD'))
-            nd_ = request.form['ND']
-            nit_ = getNitS(usuario)
-            rsol = getRsolS(usuario)
-            regExam(nit_,td_,nd_,rsol)
-    return render_template('vista_registro_p_covid.html', usuario=usuario)
-
-def allowed_file(filename):
-    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 #VISTA REGISTRO VISITA CON QR PARA ENTIDAD PUBLICA
 @app.route('/registro_visita', methods=['GET','POST'])
@@ -661,20 +394,6 @@ def vista_historiales_visitas():
             hist_completo = fVisitasP(nit_, c, fi_, ff_)
     return render_template('vista_historial_visitas.html', usuario=usuario, hist_completo=hist_completo)
 
-#VISTA REGISTRO RESULTADO PRUEBA COVID
-@app.route('/reg_res_exam', methods=['GET','POST'])
-def reg_res_exam():
-    usuario = session['user']
-    if request.method == 'POST':
-        if request.form["btn"] == "Registrar":
-            td_ = str(request.form.get('TD'))
-            nd_ = request.form['ND']
-            id_examen = request.form['idExamen']
-            res = str(request.form.get('resultado'))
-            nit_ = getNitS(usuario)
-            regResExam(int(id_examen),nit_,int(nd_),res,td_)
-    return render_template('vista_registroRes.html', usuario=usuario)
-
 #VISTA RECUPERAR CONTRASEÑA
 @app.route('/recuperar', methods=['GET','POST'])
 def recuperar_contra():
@@ -686,7 +405,6 @@ def recuperar_contra():
             usr_email = None
             t = getTipo(usr)
             if t == 1: usr_email = getCorC(usr)
-            elif t == 2: usr_email = getCorS(usr)
             elif t == 3: usr_email = getCorP(usr)
             if usr_email == email:
                 p = getPass(usr)
