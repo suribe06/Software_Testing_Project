@@ -30,7 +30,7 @@ def login():
                 session['user'] = request.form['user']
                 if tp == 1:
                     return redirect(url_for('main_civil'))
-                if tp == 3:
+                elif tp == 3:
                     return redirect(url_for('main_publico'))
             else:
                 flash("Usuario o contraseña incorrecta")
