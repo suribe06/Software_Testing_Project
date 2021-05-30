@@ -1,10 +1,8 @@
 from cassandra.cluster import Cluster
 from flask import *
 import requests, csv, sys, os
-from database import inicio, registroC, registroP, registroS, getNd, getTd, getTipo, editC, hVisitas, hExamenes, hExamenesS
-from database import getNitP, getNitS, regVisita, hVisitasP, getCatRsol, editS, editP, getCorC, getCorP, getCorS, getPass
-from database import fVisitasC, allVisitas, allExamenes, registroA, deleteU, regExam, getRsolS, editA, regVDestiempo, regResExam
-from database import fExamenesC, fVisitasP, fExamenesS, getEdad, getEstrato, salidas_recientes
+from database import inicio, registroC, registroP, getNd, getTd, getTipo, editC, regVisita, hVisitas, hVisitasP, getNitP, getCatRsol
+from database import editP, getCorC, getCorP, getPass, fVisitasC, regVDestiempo, fVisitasP, getEdad, getEstrato, salidas_recientes
 from download_files import download_csv, download_pdf
 from QR import makeQR, readQR
 from cryption import encriptar, decriptar

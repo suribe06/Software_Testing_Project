@@ -47,22 +47,22 @@ def getNd(usr):
 	"""
 	Esta funcion obtiene el numero de documento de un civil
 	"""
-    person = sessionDB.execute("SELECT ndocumento from civil where username = '{0}'".format(usr))
-    return person.one().ndocumento
+	person = sessionDB.execute("SELECT ndocumento from civil where username = '{0}'".format(usr))
+	return person.one().ndocumento
 
 def getTd(usr):
 	"""
 	Esta funcion obtiene el tipo de documento de un civil
 	"""
-    person = sessionDB.execute("SELECT tdocumento from civil where username = '{0}'".format(usr))
-    return person.one().tdocumento
+	person = sessionDB.execute("SELECT tdocumento from civil where username = '{0}'".format(usr))
+	return person.one().tdocumento
 
 def getTipo(usr):
 	"""
 	Esta funcion obtiene el tipo del usuario (civil o publica)
 	"""
-    person = sessionDB.execute("SELECT tipo from usuarios where username = '{0}'".format(usr))
-    return person.one().tipo
+	person = sessionDB.execute("SELECT tipo from usuarios where username = '{0}'".format(usr))
+	return person.one().tipo
 
 def editC(usr,pasw,ndoc,ape,bar,cor,dep,dire,mun,nac,nom,sex,tdoc,tel):
 	"""
@@ -94,68 +94,68 @@ def regVisita(ni,nd,td,nom,ape,tem,tap,rsol,cat):
 	"""
 	Esta funcion registra una visita (con qr) de un civil a un establecimienti publico
 	"""
-    person = sessionDB.execute("SELECT nombres,apellidos from civil WHERE ndocumento = {0} and tdocumento = '{1}'allow filtering".format(nd,td))
-    if person.one() != None:
-        visi = sessionDB.execute("SELECT COUNT(*) from visitas WHERE ndocumento = {0} and nit = {2} and tdocumento = '{1}'allow filtering".format(nd,td,ni))
-        i = int(visi.one().count) + 1
-        dia = dt.datetime.now()
-        temperatura = tem <= 37
-        ans = tap and temperatura
-        if ans == True:
-            sessionDB.execute("INSERT INTO visitas (id,nit,ndocumento,apellidos,categoria,fent,hent,nombres,reason,rsocial,tapa,tdocumento,temp,veredict) VALUES({0},{1},{2},'{3}','{15}','{4}-{5}-{6}','{12}:{13}:{14}','{7}','NA','{11}',{8},'{9}',{10},True)".format(i,ni,nd,ape,dia.year,dia.strftime("%m"),dia.strftime("%d"),nom,tap,td,tem,rsol,dia.hour,dia.minute,dia.second,cat))
-        else:
-            razon = ''
-            if not(tap):
-                razon = razon + '- No porta tapabocas '
-            if not(temperatura):
-                razon = razon + '- Temperatura elevada '
-            sessionDB.execute("INSERT INTO visitas (id,nit,ndocumento,apellidos,categoria,fent,hent,nombres,reason,rsocial,tapa,tdocumento,temp,veredict) VALUES({0},{1},{2},'{3}','{16}','{4}-{5}-{6}','{13}:{14}:{15}','{7}','{8}','{12}',{9},'{10}',{11},False)".format(i,ni,nd,ape,dia.year,dia.strftime("%m"),dia.strftime("%d"),nom,razon,tap,td,tem,rsol,dia.hour,dia.minute,dia.second,cat))
-    return
+	person = sessionDB.execute("SELECT nombres,apellidos from civil WHERE ndocumento = {0} and tdocumento = '{1}'allow filtering".format(nd,td))
+	if person.one() != None:
+	    visi = sessionDB.execute("SELECT COUNT(*) from visitas WHERE ndocumento = {0} and nit = {2} and tdocumento = '{1}'allow filtering".format(nd,td,ni))
+	    i = int(visi.one().count) + 1
+	    dia = dt.datetime.now()
+	    temperatura = tem <= 37
+	    ans = tap and temperatura
+	    if ans == True:
+	        sessionDB.execute("INSERT INTO visitas (id,nit,ndocumento,apellidos,categoria,fent,hent,nombres,reason,rsocial,tapa,tdocumento,temp,veredict) VALUES({0},{1},{2},'{3}','{15}','{4}-{5}-{6}','{12}:{13}:{14}','{7}','NA','{11}',{8},'{9}',{10},True)".format(i,ni,nd,ape,dia.year,dia.strftime("%m"),dia.strftime("%d"),nom,tap,td,tem,rsol,dia.hour,dia.minute,dia.second,cat))
+	    else:
+	        razon = ''
+	        if not(tap):
+	            razon = razon + '- No porta tapabocas '
+	        if not(temperatura):
+	            razon = razon + '- Temperatura elevada '
+	        sessionDB.execute("INSERT INTO visitas (id,nit,ndocumento,apellidos,categoria,fent,hent,nombres,reason,rsocial,tapa,tdocumento,temp,veredict) VALUES({0},{1},{2},'{3}','{16}','{4}-{5}-{6}','{13}:{14}:{15}','{7}','{8}','{12}',{9},'{10}',{11},False)".format(i,ni,nd,ape,dia.year,dia.strftime("%m"),dia.strftime("%d"),nom,razon,tap,td,tem,rsol,dia.hour,dia.minute,dia.second,cat))
+	return
 
 def hVisitas(nd,td):
 	"""
 	Esta funcion obtiene las visitas a establecimientos publicos realizadas por un civil
 	"""
-    v = sessionDB.execute("SELECT * from visitas WHERE ndocumento = {0} and tdocumento = '{1}' allow filtering".format(nd,td))
-    visi = []
-    for obj in v:
-        if obj.veredict == True: b = "Aceptado"
-        else: b = "Denegado"
-        a = str(obj.fent.date().year)+"-"+str(obj.fent.date().month)+"-"+str(obj.fent.date().day)
-        c = str(obj.hent.time().hour)+":"+str(obj.hent.time().minute)
-        pub = sessionDB.execute("SELECT rsocial from publica WHERE nit = {0} allow filtering".format(obj.nit))
-        pers = [pub.one().rsocial,obj.categoria,a,c,b,obj.reason]
-        visi.append(pers)
-    return visi
+	v = sessionDB.execute("SELECT * from visitas WHERE ndocumento = {0} and tdocumento = '{1}' allow filtering".format(nd,td))
+	visi = []
+	for obj in v:
+	    if obj.veredict == True: b = "Aceptado"
+	    else: b = "Denegado"
+	    a = str(obj.fent.date().year)+"-"+str(obj.fent.date().month)+"-"+str(obj.fent.date().day)
+	    c = str(obj.hent.time().hour)+":"+str(obj.hent.time().minute)
+	    pub = sessionDB.execute("SELECT rsocial from publica WHERE nit = {0} allow filtering".format(obj.nit))
+	    pers = [pub.one().rsocial,obj.categoria,a,c,b,obj.reason]
+	    visi.append(pers)
+	return visi
 
 def hVisitasP(n):
 	"""
 	Esta funcion obtiene las visitas que ha recibido un establecimiento publico
 	"""
-    v = sessionDB.execute("SELECT * from visitas WHERE nit = {0} allow filtering".format(n))
-    visi = []
-    for obj in v:
-        if obj.veredict == True: b = "Aceptado"
-        else: b = "Denegado"
-        a = str(obj.fent.date().year)+"-"+str(obj.fent.date().month)+"-"+str(obj.fent.date().day)
-        c = str(obj.hent.time().hour)+":"+str(obj.hent.time().minute)
-        pers = [obj.tdocumento,obj.ndocumento,a,c,b,obj.reason]
-        visi.append(pers)
-    return visi
+	v = sessionDB.execute("SELECT * from visitas WHERE nit = {0} allow filtering".format(n))
+	visi = []
+	for obj in v:
+	    if obj.veredict == True: b = "Aceptado"
+	    else: b = "Denegado"
+	    a = str(obj.fent.date().year)+"-"+str(obj.fent.date().month)+"-"+str(obj.fent.date().day)
+	    c = str(obj.hent.time().hour)+":"+str(obj.hent.time().minute)
+	    pers = [obj.tdocumento,obj.ndocumento,a,c,b,obj.reason]
+	    visi.append(pers)
+	return visi
 
 def getNitP(usr):
 	"""
 	Esta funcion obtiene el NIT de la entidad publica
 	"""
-    person = sessionDB.execute("SELECT Nit from Publica where username = '{0}'".format(usr))
-    return person.one().nit
+	person = sessionDB.execute("SELECT Nit from Publica where username = '{0}'".format(usr))
+	return person.one().nit
 
 def getCatRsol(usr):
 	"""
 	Esta funcion me da la categoria y la razon social de un establecimiento publico
 	"""
-    person = sessionDB.execute("SELECT rsocial, categoria from publica where username = '{0}'".format(usr))
-    return person.one().rsocial,person.one().categoria
+	person = sessionDB.execute("SELECT rsocial, categoria from publica where username = '{0}'".format(usr))
+	return person.one().rsocial,person.one().categoria
 
 def editP(usr,n,bar,cor,dep,dire,mun,pasw,rsol,tel1,tel2,tel3):
 	"""
@@ -185,85 +185,85 @@ def getCorC(usr):
 	"""
 	Esta funcion me obtiene el correo de un civil
 	"""
-    person = sessionDB.execute("SELECT correo from civil where username = '{0}'".format(usr))
-    return person.one().correo
+	person = sessionDB.execute("SELECT correo from civil where username = '{0}'".format(usr))
+	return person.one().correo
 
 def getCorP(usr):
 	"""
 	Esta funcion me obtiene el correo de un establecimiento publico
 	"""
-    person = sessionDB.execute("SELECT correo from publica where username = '{0}'".format(usr))
-    return person.one().correo
+	person = sessionDB.execute("SELECT correo from publica where username = '{0}'".format(usr))
+	return person.one().correo
 
 def getPass(usr):
 	"""
 	Esta funcion obtiene la contrasena de un usuario
 	"""
-    person = sessionDB.execute("SELECT password from usuarios where username = '{0}'".format(usr))
-    return person.one().password
+	person = sessionDB.execute("SELECT password from usuarios where username = '{0}'".format(usr))
+	return person.one().password
 
 def fVisitasC(nd,td,cat,fi,ff):
 	"""
 	Esta funcion filtra las visitas realizadas por un civil
 	"""
-    exe = "SELECT * from visitas where ndocumento = {0} and tdocumento = '{1}' ".format(nd,td)
-    exe1 = "allow filtering"
-    if fi != None: exe += "and fent >= '{0}' ".format(fi)
-    if ff != None: exe += "and fent <= '{0}' ".format(ff)
-    if cat != None: exe += "and categoria = '{0}' ".format(cat)
-    exe += exe1
-    v = sessionDB.execute(exe)
-    visi = []
-    for obj in v:
-        if obj.veredict == True: b = "Aceptado"
-        else: b = "Denegado"
-        a = str(obj.fent.date().year)+"-"+str(obj.fent.date().month)+"-"+str(obj.fent.date().day)
-        c = str(obj.hent.time().hour)+":"+str(obj.hent.time().minute)
-        pers = [obj.rsocial,obj.categoria,a,c,b,obj.reason]
-        visi.append(pers)
-    return visi
+	exe = "SELECT * from visitas where ndocumento = {0} and tdocumento = '{1}' ".format(nd,td)
+	exe1 = "allow filtering"
+	if fi != None: exe += "and fent >= '{0}' ".format(fi)
+	if ff != None: exe += "and fent <= '{0}' ".format(ff)
+	if cat != None: exe += "and categoria = '{0}' ".format(cat)
+	exe += exe1
+	v = sessionDB.execute(exe)
+	visi = []
+	for obj in v:
+	    if obj.veredict == True: b = "Aceptado"
+	    else: b = "Denegado"
+	    a = str(obj.fent.date().year)+"-"+str(obj.fent.date().month)+"-"+str(obj.fent.date().day)
+	    c = str(obj.hent.time().hour)+":"+str(obj.hent.time().minute)
+	    pers = [obj.rsocial,obj.categoria,a,c,b,obj.reason]
+	    visi.append(pers)
+	return visi
 
 def regVDestiempo(ni,nd,td,nom,ape,tem,tap,rsol,cat,fecha,hora):
 	"""
 	Esta funcion registra una visita asincrona por parte de un civil a un establecimiento publico
 	"""
-    person = sessionDB.execute("SELECT nombres,apellidos from civil WHERE ndocumento = {0} and tdocumento = '{1}' allow filtering".format(nd,td))
-    if person.one() != None:
-        visi = sessionDB.execute("SELECT COUNT(*) from visitas WHERE ndocumento = {0} and tdocumento = '{1}' and nit = {2} allow filtering".format(nd,td,ni))
-        i = int(visi.one().count)+1
-        temperatura = tem <= 37
-        ans = temperatura and tap
-        if ans:
-            sessionDB.execute("INSERT INTO visitas (id,nit,ndocumento,apellidos,categoria,fent,hent,nombres,reason,rsocial,tapa,tdocumento,temp,veredict) VALUES({0},{1},{2},'{3}','{11}','{4}','{10}:00','{5}','NA','{9}',{6},'{7}',{8},True)".format(i,ni,nd,ape,fecha,nom,tap,td,tem,rsol,hora,cat))
-        else:
-            razon = ''
-            if not(tap):
-                razon = razon + '- No porta tapabocas '
-            if not(temperatura):
-                razon = razon + '- Temperatura elevada '
-            sessionDB.execute("INSERT INTO visitas (id,nit,ndocumento,apellidos,categoria,fent,hent,nombres,reason,rsocial,tapa,tdocumento,temp,veredict) VALUES({0},{1},{2},'{3}','{11}','{4}','{10}:00','{5}','{12}','{9}',{6},'{7}',{8},False)".format(i,ni,nd,ape,fecha,nom,tap,td,tem,rsol,hora,cat,razon))
-    return
+	person = sessionDB.execute("SELECT nombres,apellidos from civil WHERE ndocumento = {0} and tdocumento = '{1}' allow filtering".format(nd,td))
+	if person.one() != None:
+	    visi = sessionDB.execute("SELECT COUNT(*) from visitas WHERE ndocumento = {0} and tdocumento = '{1}' and nit = {2} allow filtering".format(nd,td,ni))
+	    i = int(visi.one().count)+1
+	    temperatura = tem <= 37
+	    ans = temperatura and tap
+	    if ans:
+	        sessionDB.execute("INSERT INTO visitas (id,nit,ndocumento,apellidos,categoria,fent,hent,nombres,reason,rsocial,tapa,tdocumento,temp,veredict) VALUES({0},{1},{2},'{3}','{11}','{4}','{10}:00','{5}','NA','{9}',{6},'{7}',{8},True)".format(i,ni,nd,ape,fecha,nom,tap,td,tem,rsol,hora,cat))
+	    else:
+	        razon = ''
+	        if not(tap):
+	            razon = razon + '- No porta tapabocas '
+	        if not(temperatura):
+	            razon = razon + '- Temperatura elevada '
+	        sessionDB.execute("INSERT INTO visitas (id,nit,ndocumento,apellidos,categoria,fent,hent,nombres,reason,rsocial,tapa,tdocumento,temp,veredict) VALUES({0},{1},{2},'{3}','{11}','{4}','{10}:00','{5}','{12}','{9}',{6},'{7}',{8},False)".format(i,ni,nd,ape,fecha,nom,tap,td,tem,rsol,hora,cat,razon))
+	return
 
 def fVisitasP(ni,ver,fi,ff):
 	"""
 	Esta funcion filtra las visitas que recibio un establecimiento publico
 	"""
-    exe = "SELECT * from visitas where nit = {0} ".format(ni)
-    exe1 = "allow filtering"
-    if fi != None: exe += "and fent >= '{0}' ".format(fi)
-    if ff != None: exe += "and fent <= '{0}' ".format(ff)
-    if ver != None: exe += "and veredict = {0} ".format(ver)
-    exe += exe1
-    v = sessionDB.execute(exe)
-    visi = []
-    for obj in v:
-        if obj.veredict == True: b = "Aceptado"
-        else: b = "Denegado"
-        a = str(obj.fent.date().year)+"-"+str(obj.fent.date().month)+"-"+str(obj.fent.date().day)
-        c = str(obj.hent.time().hour)+":"+str(obj.hent.time().minute)
-        pers = [obj.ndocumento,obj.tdocumento,a,c,b,obj.reason]
-        visi.append(pers)
-    return visi
+	exe = "SELECT * from visitas where nit = {0} ".format(ni)
+	exe1 = "allow filtering"
+	if fi != None: exe += "and fent >= '{0}' ".format(fi)
+	if ff != None: exe += "and fent <= '{0}' ".format(ff)
+	if ver != None: exe += "and veredict = {0} ".format(ver)
+	exe += exe1
+	v = sessionDB.execute(exe)
+	visi = []
+	for obj in v:
+	    if obj.veredict == True: b = "Aceptado"
+	    else: b = "Denegado"
+	    a = str(obj.fent.date().year)+"-"+str(obj.fent.date().month)+"-"+str(obj.fent.date().day)
+	    c = str(obj.hent.time().hour)+":"+str(obj.hent.time().minute)
+	    pers = [obj.ndocumento,obj.tdocumento,a,c,b,obj.reason]
+	    visi.append(pers)
+	return visi
 
 def getEdad(usr):
 	"""
