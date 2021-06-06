@@ -14,7 +14,7 @@ def inicio(usr,pasw):
 	else:ans,tp = True, person.one().tipo
 	return ans,tp
 
-def registroC(usr,pasw,ndoc,ape,bar,cor,dep,dire,mun,nac,nom,sex,tdoc,tel):
+def registroC(usr,pasw,ndoc,ape,bar,cor,dep,dire,mun,nac,nom,sex,tdoc,tel,estrato):
 	"""
 	Esta funcion registra un civil en la base de datos
 	"""
@@ -23,7 +23,7 @@ def registroC(usr,pasw,ndoc,ape,bar,cor,dep,dire,mun,nac,nom,sex,tdoc,tel):
 	ans = False
 	if person1.one() == None and person2.one() == None:
 		ans = True
-		sessionDB.execute("INSERT INTO civil (username,ndocumento,apellidos,barrio,correo,departamento,direccion,municipio,nacimiento,nombres,password,sexo,tdocumento,telefono) VALUES('{0}',{1},'{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}',{13})".format(usr,ndoc,ape,bar,cor,dep,dire,mun,nac,nom,pasw,sex,tdoc,tel))
+		sessionDB.execute("INSERT INTO civil (username,ndocumento,apellidos,barrio,correo,departamento,direccion,municipio,nacimiento,nombres,password,sexo,tdocumento,telefono,estrato) VALUES('{0}',{1},'{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}',{13}, {14})".format(usr,ndoc,ape,bar,cor,dep,dire,mun,nac,nom,pasw,sex,tdoc,tel,estrato))
 		sessionDB.execute("INSERT INTO usuarios (username,password,tipo) VALUES ('{0}','{1}',{2})".format(usr,pasw,1))
 	return ans
 
@@ -33,7 +33,9 @@ def registroP(usr,n,bar,cat,cor,dep,dir,mun,pasw,rsol,tel):
 	"""
 	ent1 = sessionDB.execute("SELECT password,tipo from usuarios WHERE username = '{0}'".format(usr))
 	ent2 = sessionDB.execute("SELECT username, Nit from publica WHERE Nit = {0} allow filtering".format(n))
+	ans = False
 	if ent1.one() == None and ent2.one() == None:
+		ans = True
 		sessionDB.execute("INSERT INTO usuarios (username,password,tipo) VALUES ('{0}','{1}',{2})".format(usr,pasw,3))
 		if len(tel) == 3:
 			sessionDB.execute("INSERT INTO publica (username,Nit,barrio,categoria,correo,departamento,direccion,municipio,password,rsocial,telefono1,telefono2,telefono3) VALUES ('{0}',{1},'{2}','{12}','{3}','{4}','{5}','{6}','{7}','{8}',{9},{10},{11})".format(usr,n,bar,cor,dep,dir,mun,pasw,rsol,tel[0],tel[1],tel[2],cat))
@@ -41,6 +43,7 @@ def registroP(usr,n,bar,cat,cor,dep,dir,mun,pasw,rsol,tel):
 			sessionDB.execute("INSERT INTO publica (username,Nit,barrio,categoria,correo,departamento,direccion,municipio,password,rsocial,telefono1,telefono2,telefono3) VALUES ('{0}',{1},'{2}','{11}','{3}','{4}','{5}','{6}','{7}','{8}',{9},{10},NULL)".format(usr,n,bar,cor,dep,dir,mun,pasw,rsol,tel[0],tel[1],cat))
 		else:
 			sessionDB.execute("INSERT INTO publica (username,Nit,barrio,categoria,correo,departamento,direccion,municipio,password,rsocial,telefono1,telefono2,telefono3) VALUES ('{0}',{1},'{2}','{10}','{3}','{4}','{5}','{6}','{7}','{8}',{9},NULL,NULL)".format(usr,n,bar,cor,dep,dir,mun,pasw,rsol,tel[0],cat))
+	return ans
 
 def getNd(usr):
 	"""
@@ -63,7 +66,7 @@ def getTipo(usr):
 	person = sessionDB.execute("SELECT tipo from usuarios where username = '{0}'".format(usr))
 	return person.one().tipo
 
-def editC(usr,pasw,ndoc,ape,bar,cor,dep,dire,mun,nac,nom,sex,tdoc,tel):
+def editC(usr,pasw,ndoc,ape,bar,cor,dep,dire,mun,nac,nom,sex,tdoc,tel,estrato):
 	"""
 	Esta funcion edita el perfil de un civil
 	"""
@@ -82,10 +85,10 @@ def editC(usr,pasw,ndoc,ape,bar,cor,dep,dire,mun,nac,nom,sex,tdoc,tel):
 	if nom != None: exe+="nombres = '{0}',".format(nom)
 	if sex != None: exe+="sexo = '{0}',".format(sex)
 	if tel != None: exe+="telefono = {0},".format(tel)
+	if estrato != None: exe+="estrato = {0},".format(estrato)
 	if len(exe) > 17:
 		exe = exe[:len(exe)-1]
 		exe+= exe1
-		print(exe)
 		sessionDB.execute(exe)
 
 def regVisita(ni,nd,td,nom,ape,tem,tap,rsol,cat):

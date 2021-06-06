@@ -25,7 +25,6 @@
           <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
             <form  method="POST" action="/main_civil">
               <input class="dropdown-item" type ="submit" value="Editar Perfil" name="btn" >
-              <input class="dropdown-item" type ="submit" value="Contáctanos" name="btn" >
               <input class="dropdown-item" type ="submit" value="Cerrar Sesión" name="btn" >
             </form>
           </div>
@@ -66,7 +65,6 @@
         <td>
           <select name="departamento" id="departamento" onchange="cargarMunicipio()">
             <option disabled selected>Departamento</option>
-
           </select>
         </td>
         <td colspan="2"></td>
@@ -79,7 +77,17 @@
           </select>
         </td>
         <td colspan="2"></td>
-        <td> <input type="submit" name="btn" id="guardar" value="Guardar"></td>
+        <td>
+          <select name="estrato" id="estrato">
+            <option value="" disabled selected>Estrato</option>
+            <option value = "1">1</option>
+            <option value = "2">2</option>
+            <option value ="3">3</option>
+            <option value ="4">4</option>
+            <option value ="5">5</option>
+            <option value ="6">6</option>
+          </select>
+        </td>
       </tr>
       <tr>
         <td>
@@ -87,6 +95,8 @@
             <option disabled selected>Barrio</option>
           </select>
         </td>
+        <td colspan="2"></td>
+        <td> <input type="submit" name="btn" id="guardar" value="Guardar"></td>
       </tr>
       <tr>
         <td><input type="text" name="direccion" placeholder="Dirección"></td>

@@ -6,7 +6,6 @@ from database import editP, getCorC, getCorP, getPass, fVisitasC, regVDestiempo,
 from download_files import download_csv, download_pdf
 from QR import makeQR, readQR
 from cryption import encriptar, decriptar
-from correo import enviar_correo
 from extra_functions import calcular_riesgo
 
 #Configuramos la app de flask
@@ -36,8 +35,6 @@ def login():
                 flash("Usuario o contraseña incorrecta")
         elif request.form["b1"]=="Registrarse":
             return redirect(url_for('register_select'))
-        elif request.form["b1"]=="Recordar Contraseña":
-            return redirect(url_for('recuperar_contra'))
     return render_template('login.html')
 
 #VISTA SELECCIONAR TIPO DE REGISTRO
@@ -67,10 +64,11 @@ def register_civil():
         genero_ = request.form['genero']
         tel = request.form['telefono']
         email = request.form['correo']
+        estrato = request.form['estrato']
         u = request.form['username']
         p = encriptar(request.form['password'])
         #Registro del civil en la base de datos
-        ans = registroC(u, p, int(numDoc), apellidos_, barrio_, email, dept, dire, mun, fecha_, nombres_, genero_, tipoDoc, int(tel))
+        ans = registroC(u, p, int(numDoc), apellidos_, barrio_, email, dept, dire, mun, fecha_, nombres_, genero_, tipoDoc, int(tel), int(estrato))
         if ans == True:
             data = {}
             data["Nombre"] = nombres_
@@ -79,7 +77,7 @@ def register_civil():
             data["Numero Documento"] = numDoc
             #Se crea el codigo qr del civil
             makeQR(data)
-        return redirect(url_for('login'))
+            return redirect(url_for('login'))
     return render_template('register_civil.html')
 
 #VISTA REGISTRO DE ENTIDAD PUBLICA
@@ -104,11 +102,9 @@ def register_publico():
         u = request.form['username']
         p = encriptar(request.form['password'])
         #Registro de la entidad publica en la base de datos
-        registroP(u, int(nit_), barrio_, cat, email, dept_, dir_, mun_, p, razon_, tels)
-        m = ""
-        m += "La entidad publica identificada con el NIT " + nit_ + " se acaba de registrar en el sistema"
-        enviar_correo("gerentebbgm@gmail.com", "Registro entidad publica", m)
-        return redirect(url_for('login'))
+        ans = registroP(u, int(nit_), barrio_, cat, email, dept_, dir_, mun_, p, razon_, tels)
+        if ans == True:
+            return redirect(url_for('login'))
     return render_template('register_publico.html')
 
 #VISTA MAIN CIVIL
@@ -125,8 +121,6 @@ def main_civil():
                 return redirect(url_for('vista_qr'))
             elif request.form["btn"] == "Historial de visitas":
                 return redirect(url_for('vista_historiales'))
-            elif request.form["btn"] == "Contáctanos":
-                return redirect(url_for('contacto'))
             elif request.form["btn"] == "Editar Perfil":
                 return redirect(url_for('editar_perfil_civil'))
             elif request.form["btn"] == "Calcular Riesgo":
@@ -149,8 +143,6 @@ def main_publico():
                 return redirect(url_for('registro_visita'))
             elif request.form["btn"] == "Historial de visitas":
                 return redirect(url_for('vista_historiales_visitas'))
-            elif request.form["btn"] == "Contáctanos":
-                return redirect(url_for('contacto_publico'))
             elif request.form["btn"] == "Editar Perfil":
                 return redirect(url_for('editar_perfil_publico'))
     return render_template('main_publico.html', usuario=usuario)
@@ -171,7 +163,11 @@ def vista_riesgo():
             mensaje_riesgo = "{0}, tu factor de riesgo de infección es: {1}".format(usuario, riesgo)
         elif request.form["btn"] == "Volver":
             return redirect(url_for('main_civil'))
-
+        elif request.form["btn"] == "Editar Perfil":
+            return redirect(url_for('editar_perfil_civil'))
+        elif request.form["btn"] == "Cerrar Sesión":
+            session.pop('user', None)
+            return redirect(url_for('login'))
     return render_template('vista_riesgo.html', usuario=usuario, mensaje_riesgo=mensaje_riesgo)
 
 #VISTA DEL CODIGO QR PARA EL CIVIL
@@ -239,7 +235,9 @@ def editar_perfil_civil():
                 else: dir_ = None
                 if len(request.form['contraseña']) != 0: p = encriptar(request.form['contraseña'])
                 else: p = None
-                editC(usuario, p, int(nd), apellidos_, barrio_, email, dept_, dir_, mun_, fecha_, nombres_, genero_, td, tel_)
+                if request.form.get('estrato') != None: estrato = str(request.form.get('estrato'))
+                else: estrato = None
+                editC(usuario, p, int(nd), apellidos_, barrio_, email, dept_, dir_, mun_, fecha_, nombres_, genero_, td, tel_, estrato)
             elif request.form["btn"] == "Volver":
                 return redirect(url_for('main_civil'))
     return render_template('editar_perfil_civil.html', usuario=usuario)
@@ -350,27 +348,6 @@ def vista_historiales_visitas():
             nit_ = getNitP(usuario)
             hist_completo = fVisitasP(nit_, c, fi_, ff_)
     return render_template('vista_historial_visitas.html', usuario=usuario, hist_completo=hist_completo)
-
-#VISTA RECUPERAR CONTRASEÑA
-@app.route('/recuperar', methods=['GET','POST'])
-def recuperar_contra():
-    mensaje = ""
-    if request.method == 'POST':
-        if request.form["btn"] == "Recuperar":
-            usr = request.form['usuario']
-            email = request.form['correo']
-            usr_email = None
-            t = getTipo(usr)
-            if t == 1: usr_email = getCorC(usr)
-            elif t == 3: usr_email = getCorP(usr)
-            if usr_email == email:
-                p = getPass(usr)
-                m = "Tu contrasena es {0}".format(decriptar(p))
-                enviar_correo(usr_email, "Recuperacion contrasena", m)
-                mensaje = "Tu contrasena ha sido enviada a tu correo"
-            else:
-                mensaje = "El correo que ingresaste no esta asociado al usuario ingresado"
-    return render_template('recuperar_contrasena.html', mensaje=mensaje)
 
 if __name__ == "__main__":
     app.debug = True
