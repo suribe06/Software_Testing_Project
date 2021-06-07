@@ -30,7 +30,7 @@
         </td>
       </tr>
       <tr>
-        <td> <input type="number" name="numeroDocumento" placeholder="Numero Documento" id="documento" required></td>
+        <td> <input type="number" min="0" name="numeroDocumento" placeholder="Numero Documento" id="documento" required></td>
         <td>
           <select name="departamento" id="departamento" onchange="cargarMunicipio()" >
             <option value="" disabled selected>Departamento</option>
@@ -61,7 +61,7 @@
         </td>
       </tr>
       <tr>
-        <td> <input type="number" name="telefono" placeholder="Telefono" id="telefono" required></td>
+        <td> <input type="number" min="0" name="telefono" placeholder="Telefono" id="telefono" required></td>
         <td> <input type="email" name="correo" placeholder="Correo" id="correo" required></td>
       </tr>
       <tr>
