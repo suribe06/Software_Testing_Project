@@ -199,9 +199,9 @@ def vista_historiales():
             hist_completo = fVisitasC(nd_,td_,cat_,fi_,ff_)
         elif request.form["btn"] == "Descargar":
             if str(request.form.get('formato')) == "CSV":
-                download_csv(fields, hist_completo, 1)
+                download_csv(usuario, fields, hist_completo, 1)
             elif str(request.form.get('formato')) == "PDF":
-                download_pdf(fields, hist_completo, 1)
+                download_pdf(usuario, fields, hist_completo, 1)
     return render_template('vista_historiales.html', usuario=usuario, hist_completo=hist_completo)
 
 #VISTA EDITAR PERFIL PARA EL CIVIL
@@ -333,9 +333,9 @@ def vista_historiales_visitas():
     if request.method == 'POST':
         if request.form["btn"] == "Descargar":
             if str(request.form.get('formato')) == "CSV":
-                download_csv(fields, hist_completo, 1)
+                download_csv(usuario, fields, hist_completo, 1)
             elif str(request.form.get('formato')) == "PDF":
-                download_pdf(fields, hist_completo, 1)
+                download_pdf(usuario, fields, hist_completo, 1)
         elif request.form["btn"] == "Filtrar":
             if len(request.form['fi']) != 0: fi_ = request.form['fi']
             else: fi_ = None

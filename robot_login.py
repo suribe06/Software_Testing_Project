@@ -26,8 +26,6 @@ with open('data_login.csv') as csv_file:
             #cerras sesion
             element = driver.find_element_by_id('dropdownMenu2')
             ActionChains(driver).click(element).perform()
-
-            #Cerrar sesion
             driver.find_element_by_id("cs").click()
             print("el caso", cont, "pasó")
         except NoSuchElementException:

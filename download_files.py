@@ -3,17 +3,15 @@ import sys
 import os
 from fpdf import FPDF
 
-def download_csv(fields, rows, tipo):
+def download_csv(user, fields, rows, tipo):
     if tipo == 1:
-        filename = "historial_visitas.csv"
-    elif tipo == 2:
-        filename = "historial_pruebas_covid.csv"
+        filename = "historial_visitas_{0}.csv".format(user)
     with open(filename, 'w') as csvfile:
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow(fields)
         csvwriter.writerows(rows)
 
-def download_pdf(fields, rows, tipo):
+def download_pdf(user, fields, rows, tipo):
     pdf = FPDF(orientation = 'L')
     pdf.add_page()
     pdf.set_font('Arial', 'B', 12)
@@ -28,7 +26,5 @@ def download_pdf(fields, rows, tipo):
             r = r + str(x) + ' | '
         pdf.cell(0, 10, txt = r, ln = 1, align = 'C')
     if tipo == 1:
-        filename = "historial_visitas.pdf"
-    elif tipo == 2:
-        filename = "historial_pruebas_covid.pdf"
+        filename = "historial_visitas_{0}.pdf".format(user)
     pdf.output(filename)
