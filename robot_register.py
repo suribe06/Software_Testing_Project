@@ -54,3 +54,5 @@ select.select_by_visible_text('4')
 
 #Click en registrar
 driver.find_element_by_name("Registrarse").click()
+
+driver.quit()
