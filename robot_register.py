@@ -5,7 +5,8 @@ from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
 import csv
 
-driver = webdriver.Firefox(executable_path='/home/nicolasibagon/Escritorio/geckodriver')
+#driver = webdriver.Firefox(executable_path='/home/nicolasibagon/Escritorio/geckodriver')
+driver = Chrome()
 driver.get("http://127.0.0.1:5000/")
 
 
@@ -35,7 +36,8 @@ with open('data_register.csv') as csv_file:
             date_input = driver.find_element_by_name('fecha')
             date_input.click()
             date_input.clear()
-            date_input.send_keys("1999-05-06")
+            date_input.send_keys("05061999")
+            #date_input.send_keys("1999-05-06")
 
             #Tipo de Documento
             select = Select(driver.find_element_by_id('tipoDocumento'))
